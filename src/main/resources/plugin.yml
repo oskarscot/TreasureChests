@@ -1,0 +1,8 @@
+name: TreasureChests
+main: scot.oskar.treasurechests.TreasureChests
+version: 1.0.0
+author: oskarscot
+api-version: 1.13
+
+commands:
+    registerchest:
