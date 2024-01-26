@@ -9,8 +9,8 @@ object TimeHelper {
         try {
             val duration = Duration.parse(isoDurationString)
             val hours = duration.inWholeHours
-            val minutes = duration.inWholeMinutes
-            val seconds = duration.inWholeSeconds
+            val minutes = duration.inWholeMinutes % 60
+            val seconds = duration.inWholeSeconds % 60
 
             val formattedString = buildString {
                 if (hours > 0) append("$hours ${if (hours == 1L) "hour" else "hours"} ")

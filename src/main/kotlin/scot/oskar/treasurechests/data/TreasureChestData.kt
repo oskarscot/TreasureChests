@@ -9,5 +9,5 @@ data class TreasureChestData(
     val id: UUID,
     val location: Location,
     val openInterval: Duration,
-    val contents: List<ItemStack?>
+    val contents: Map<Int, ItemStack?>
 )

@@ -59,7 +59,9 @@ class RegisterChestCommand(private val pluginConfiguration: PluginConfiguration)
                 id = UUID.randomUUID(),
                 location = block.location,
                 openInterval = Duration.parse(args[0]),
-                contents = blockState.inventory.contents.toList()
+                contents = blockState.inventory.contents.mapIndexedNotNull { index, itemStack ->
+                    itemStack?.let { index to it }
+                }.toMap()
             )
         )
         pluginConfiguration.save()

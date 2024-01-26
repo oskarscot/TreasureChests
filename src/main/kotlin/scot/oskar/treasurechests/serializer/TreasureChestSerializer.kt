@@ -25,7 +25,7 @@ class TreasureChestSerializer: ObjectSerializer<TreasureChestData> {
         val id = data.get("id", UUID::class.java)
         val location = data.get("location", Location::class.java)
         val openInterval = data.get("openInterval", Duration::class.java)
-        val contents = data.getAsList("contents", ItemStack::class.java)
+        val contents = data.getAsMap("contents", Int::class.java, ItemStack::class.java)
         return TreasureChestData(id, location, openInterval, contents)
     }
 }

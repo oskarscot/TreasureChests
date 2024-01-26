@@ -18,7 +18,7 @@ class PluginConfiguration: OkaeriConfig() {
 
     class ChestsConfiguration: OkaeriConfig() {
         @Comment("Item to use for chests")
-        var chestItem: ItemStack = ItemStack(Material.BARREL)
+        var chestItem: ItemStack = ItemStack(Material.CHEST)
         @Comment("List of all chests in the world")
         var savedChests: MutableList<TreasureChestData> = mutableListOf()
     }

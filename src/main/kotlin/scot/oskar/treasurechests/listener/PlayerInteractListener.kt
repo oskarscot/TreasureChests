@@ -85,7 +85,7 @@ class PlayerInteractListener(private val pluginConfiguration: PluginConfiguratio
 
     private fun openChest(player: Player, chest: TreasureChestData) {
         player.server.createInventory(player, 3 * 9, Component.text(chest.id.toString())).apply {
-            chest.contents.forEachIndexed { index, itemStack ->
+            chest.contents.forEach { (index, itemStack) ->
                 this.setItem(index, itemStack)
             }
             player.openInventory(this)
