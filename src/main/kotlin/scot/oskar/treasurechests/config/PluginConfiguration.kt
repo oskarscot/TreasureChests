@@ -14,6 +14,7 @@ class PluginConfiguration: OkaeriConfig() {
 
     var database = DatabaseConfiguration()
     var chests = ChestsConfiguration()
+    var messages = MessagesConfiguration()
 
     class ChestsConfiguration: OkaeriConfig() {
         @Comment("Item to use for chests")
@@ -33,5 +34,9 @@ class PluginConfiguration: OkaeriConfig() {
         var password = "admin"
         @Comment("Whether to log SQL queries to the console")
         var logger = true
+    }
+
+    class MessagesConfiguration: OkaeriConfig() {
+        var usage = "<gray>Correct usage: <yellow><usage></yellow> </gray>"
     }
 }

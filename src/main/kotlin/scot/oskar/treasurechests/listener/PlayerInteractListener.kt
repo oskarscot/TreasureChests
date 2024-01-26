@@ -11,6 +11,7 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
+import scot.oskar.treasurechests.TimeHelper
 import scot.oskar.treasurechests.data.TreasureChestData
 import scot.oskar.treasurechests.config.PluginConfiguration
 import scot.oskar.treasurechests.model.PlayerInteractions
@@ -47,32 +48,29 @@ class PlayerInteractListener(private val pluginConfiguration: PluginConfiguratio
             }.firstOrNull()
         }
 
+        // Player has not interacted with the chest before
+        // Open the chest and save the new interaction
         if (previousInteraction == null) {
-            // Player has not interacted with the chest before
+
             transaction {
                 PlayerInteractions.insert {
                     it[PlayerInteractions.player] = player.uniqueId
                     it[chestId] = chest.id
                 }
             }
-            player.sendMessage("<gray>You have interacted with the chest for the first time".toMiniMessage())
+
+            this.openChest(player, chest)
+
         } else {
-            // Player has interacted with the chest before
             val lastInteraction = previousInteraction[PlayerInteractions.lastInteraction]
-            val timeSinceLastInteraction = now.minus(lastInteraction.toInstant(TimeZone.currentSystemDefault()))
+            val timeSinceLastInteraction = now - lastInteraction.toInstant(TimeZone.currentSystemDefault())
 
             if (timeSinceLastInteraction < chest.openInterval) {
-                // Player has interacted with the chest too recently
                 val remainingTime = chest.openInterval - timeSinceLastInteraction
-                player.sendMessage("<gray>You can interact with the chest again in <yellow>$remainingTime</yellow>".toMiniMessage())
+                player.sendMessage("<gray>You can interact with the chest again in <yellow>${TimeHelper.formatDuration(remainingTime.toIsoString())}</yellow>".toMiniMessage())
             } else {
-                // Player has interacted with the chest recently enough
-                player.server.createInventory(player, chest.inventoryRows * 9, Component.text(chest.id.toString())).apply {
-                    chest.contents.forEachIndexed { index, itemStack ->
-                        this.setItem(index, itemStack)
-                    }
-                    player.openInventory(this)
-                }
+
+                this.openChest(player, chest)
 
                 transaction {
                     PlayerInteractions.update({
@@ -82,6 +80,15 @@ class PlayerInteractListener(private val pluginConfiguration: PluginConfiguratio
                     }
                 }
             }
+        }
+    }
+
+    private fun openChest(player: Player, chest: TreasureChestData) {
+        player.server.createInventory(player, 3 * 9, Component.text(chest.id.toString())).apply {
+            chest.contents.forEachIndexed { index, itemStack ->
+                this.setItem(index, itemStack)
+            }
+            player.openInventory(this)
         }
     }
 }

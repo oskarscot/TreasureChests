@@ -1,6 +1,6 @@
 package scot.oskar.treasurechests.command
 
-import org.bukkit.block.Chest
+import org.bukkit.block.Container
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -13,19 +13,22 @@ import kotlin.time.Duration
 
 class RegisterChestCommand(private val pluginConfiguration: PluginConfiguration): CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
-        // Check if the sender is a player
         if (sender !is Player) {
             sender.sendMessage("Only players can use this command")
             return true
         }
 
-        if(args.isNullOrEmpty()) {
-            sender.sendMessage("<gray>Usage: <yellow>/registerchest [interval]".toMiniMessage())
+        if (args.isNullOrEmpty()) {
+            sender.sendMessage(pluginConfiguration.messages.usage.toMiniMessage().replaceText {
+                it.match("<usage>").replacement("/registerchest [interval]")
+            })
             return true
         }
 
         if(args.size > 1) {
-            sender.sendMessage("<gray>Usage: <yellow>/registerchest [interval]".toMiniMessage())
+            sender.sendMessage(pluginConfiguration.messages.usage.toMiniMessage().replaceText {
+                it.match("<usage>").replacement("/registerchest [interval]")
+            })
             return true
         }
 
@@ -35,22 +38,32 @@ class RegisterChestCommand(private val pluginConfiguration: PluginConfiguration)
             sender.sendMessage("<gray>You must be looking at a <yellow>${pluginConfiguration.chests.chestItem.type}</yellow> to register it".toMiniMessage())
             return true
         }
+
+        // check if the chest is already registered
         if(pluginConfiguration.chests.savedChests.any { it.location == block.location }) {
             sender.sendMessage("<gray>This chest is already registered".toMiniMessage())
             return true
         }
-        val chest: Chest = block.state as Chest
 
+        val blockState = block.state
+
+        // check if the block is a container
+        if(blockState !is Container) {
+            sender.sendMessage("<gray>This chest is not a container".toMiniMessage())
+            return true
+        }
+
+        // add the chest to the list of saved chests
         pluginConfiguration.chests.savedChests.add(
             TreasureChestData(
                 id = UUID.randomUUID(),
                 location = block.location,
                 openInterval = Duration.parse(args[0]),
-                inventoryRows = 3,
-                contents = chest.inventory.contents.toList()
+                contents = blockState.inventory.contents.toList()
             )
         )
-        //pluginConfiguration.save()
+        pluginConfiguration.save()
+        sender.sendMessage("<gray>Chest registered".toMiniMessage())
         return true
     }
 }

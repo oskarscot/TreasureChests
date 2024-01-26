@@ -14,6 +14,8 @@ import scot.oskar.treasurechests.command.RegisterChestCommand
 import scot.oskar.treasurechests.config.PluginConfiguration
 import scot.oskar.treasurechests.listener.PlayerInteractListener
 import scot.oskar.treasurechests.model.PlayerInteractions
+import scot.oskar.treasurechests.serializer.DurationTransformer
+import scot.oskar.treasurechests.serializer.TreasureChestSerializer
 import java.io.File
 
 open class TreasureChests: JavaPlugin() {
@@ -23,9 +25,13 @@ open class TreasureChests: JavaPlugin() {
 
     override fun onEnable() {
         logger.info("Loading configuration...")
-        pluginConfiguration = ConfigManager.create(PluginConfiguration::class.java) {
+        pluginConfiguration = ConfigManager.create(PluginConfiguration::class.java) { it ->
             it.withConfigurer(YamlBukkitConfigurer(), SerdesCommons())
             it.withSerdesPack(SerdesBukkit())
+            it.withSerdesPack { registry ->
+                registry.register(TreasureChestSerializer())
+                registry.register(DurationTransformer())
+            }
             it.withBindFile(configFile)
             it.saveDefaults()
             it.load(true)
