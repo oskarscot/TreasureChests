@@ -35,13 +35,15 @@ class RegisterChestCommand(private val pluginConfiguration: PluginConfiguration)
         // check what block the player is looking at
         val block = sender.getTargetBlock(null, 5)
         if (block.type != pluginConfiguration.chests.chestItem.type) {
-            sender.sendMessage("<gray>You must be looking at a <yellow>${pluginConfiguration.chests.chestItem.type}</yellow> to register it".toMiniMessage())
+            sender.sendMessage(pluginConfiguration.messages.mustBeLookingAtBlock.toMiniMessage().replaceText {
+                it.match("<block>").replacement(pluginConfiguration.chests.chestItem.type.toString())
+            })
             return true
         }
 
         // check if the chest is already registered
         if(pluginConfiguration.chests.savedChests.any { it.location == block.location }) {
-            sender.sendMessage("<gray>This chest is already registered".toMiniMessage())
+            sender.sendMessage(pluginConfiguration.messages.chestAlreadyRegistered.toMiniMessage())
             return true
         }
 
@@ -49,7 +51,7 @@ class RegisterChestCommand(private val pluginConfiguration: PluginConfiguration)
 
         // check if the block is a container
         if(blockState !is Container) {
-            sender.sendMessage("<gray>This chest is not a container".toMiniMessage())
+            sender.sendMessage(pluginConfiguration.messages.blockNotAContainer.toMiniMessage())
             return true
         }
 
@@ -60,12 +62,12 @@ class RegisterChestCommand(private val pluginConfiguration: PluginConfiguration)
                 location = block.location,
                 openInterval = Duration.parse(args[0]),
                 contents = blockState.inventory.contents.mapIndexedNotNull { index, itemStack ->
-                    itemStack?.let { index to it }
+                    itemStack?.let { index to it } // let will skip null values
                 }.toMap()
             )
         )
         pluginConfiguration.save()
-        sender.sendMessage("<gray>Chest registered".toMiniMessage())
+        sender.sendMessage(pluginConfiguration.messages.chestRegistered.toMiniMessage())
         return true
     }
 }

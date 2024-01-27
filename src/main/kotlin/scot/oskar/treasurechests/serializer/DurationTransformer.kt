@@ -6,6 +6,7 @@ import eu.okaeri.configs.serdes.SerdesContext
 import kotlin.time.Duration
 
 class DurationTransformer: BidirectionalTransformer<String, Duration>() {
+
     override fun getPair(): GenericsPair<String, Duration> {
         return genericsPair(String::class.java, Duration::class.java)
     }

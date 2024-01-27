@@ -11,6 +11,7 @@ import java.util.*
 import kotlin.time.Duration
 
 class TreasureChestSerializer: ObjectSerializer<TreasureChestData> {
+
     override fun supports(type: Class<in TreasureChestData>): Boolean =
         TreasureChestData::class.java.isAssignableFrom(type)
 

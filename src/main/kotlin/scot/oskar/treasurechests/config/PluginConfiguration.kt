@@ -38,5 +38,10 @@ class PluginConfiguration: OkaeriConfig() {
 
     class MessagesConfiguration: OkaeriConfig() {
         var usage = "<gray>Correct usage: <yellow><usage></yellow> </gray>"
+        var mustBeLookingAtBlock = "<gray>You must be looking at a <yellow><block></yellow> to register it</gray>"
+        var chestAlreadyRegistered = "<gray>This chest is already registered</gray>"
+        var blockNotAContainer = "<gray>Target block is not a container</gray>"
+        var chestRegistered = "<gray>Chest registered</gray>"
+        var cantInteractMessage = "<gray>You can interact with this chest again in <yellow><time></yellow></gray>"
     }
 }

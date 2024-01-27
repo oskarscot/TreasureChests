@@ -21,8 +21,6 @@ dependencies {
     compileOnly("org.jetbrains:annotations:24.1.0")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.22")
-    implementation("org.apache.commons:commons-lang3:3.14.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
     implementation("org.jetbrains.exposed:exposed-core:0.46.0")
     implementation("org.jetbrains.exposed:exposed-dao:0.46.0")

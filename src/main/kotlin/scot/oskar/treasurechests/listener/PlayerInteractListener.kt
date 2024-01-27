@@ -30,6 +30,7 @@ class PlayerInteractListener(private val pluginConfiguration: PluginConfiguratio
         } ?: return
 
         event.isCancelled = true
+
         //handle the chest interaction
         this.handleChestInteraction(event.player, chest)
     }
@@ -52,6 +53,7 @@ class PlayerInteractListener(private val pluginConfiguration: PluginConfiguratio
         // Open the chest and save the new interaction
         if (previousInteraction == null) {
 
+            // Save the new interaction with the chest before opening it
             transaction {
                 PlayerInteractions.insert {
                     it[PlayerInteractions.player] = player.uniqueId
@@ -65,13 +67,17 @@ class PlayerInteractListener(private val pluginConfiguration: PluginConfiguratio
             val lastInteraction = previousInteraction[PlayerInteractions.lastInteraction]
             val timeSinceLastInteraction = now - lastInteraction.toInstant(TimeZone.currentSystemDefault())
 
+            // Player has interacted with the chest too recently
             if (timeSinceLastInteraction < chest.openInterval) {
                 val remainingTime = chest.openInterval - timeSinceLastInteraction
-                player.sendMessage("<gray>You can interact with the chest again in <yellow>${TimeHelper.formatDuration(remainingTime.toIsoString())}</yellow>".toMiniMessage())
+                player.sendMessage(pluginConfiguration.messages.cantInteractMessage.toMiniMessage().replaceText {
+                    it.match("<time>").replacement(TimeHelper.formatDuration(remainingTime.toIsoString()))
+                })
             } else {
 
                 this.openChest(player, chest)
 
+                // Update the last interaction time
                 transaction {
                     PlayerInteractions.update({
                         (PlayerInteractions.player eq player.uniqueId) and (PlayerInteractions.chestId eq chest.id)
@@ -83,6 +89,9 @@ class PlayerInteractListener(private val pluginConfiguration: PluginConfiguratio
         }
     }
 
+    /**
+     * Opens the chest for the player
+     */
     private fun openChest(player: Player, chest: TreasureChestData) {
         player.server.createInventory(player, 3 * 9, Component.text(chest.id.toString())).apply {
             chest.contents.forEach { (index, itemStack) ->
